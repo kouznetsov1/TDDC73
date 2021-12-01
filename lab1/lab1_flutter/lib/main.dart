@@ -40,7 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 "images/image.png",
               ),
               alignment: Alignment.center,
-              padding: EdgeInsets.only(top: 5),
+              padding: EdgeInsets.only(top: 25),
             ),
             const SizedBox(height: 30), // instead of padding
             Row(
