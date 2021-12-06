@@ -17,42 +17,38 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.blue,
-          title: const Text("Laboration dos"),
-        ),
-        body: Stack(
-          children: [
-            Positioned(
-              child: Container(
-                  child: const Center(
-                    child: FractionallySizedBox(
+          appBar: AppBar(
+            backgroundColor: Colors.blue,
+            title: const Text("Laboration dos"),
+          ),
+          body: Stack(
+            children: [
+              Positioned(
+                  child: Container(
+                    child: const Positioned(
                       child: InputBox(),
-                      widthFactor: 0.9,
                     ),
+                    margin: const EdgeInsets.only(top: 10),
+                    color: Colors.white,
                   ),
-                  margin: const EdgeInsets.only(top: 20),
-                  color: Colors.grey
-              ),
-              height: 550,
-              right: 20,
-            ),
-            Positioned(
-              child: Container(
-                child: const Center(
-                  child: FractionallySizedBox(
-                    child: CreditCard(),
-                    widthFactor: 0.8,
+                  height: 450,
+                  width: 380,
+                  right: 15,
+                  top: 120),
+              /*Positioned(
+                  child: Container(
+                    child: const FractionallySizedBox(
+                      child: CreditCard(),
+                      widthFactor: 0.85,
+                    ),
+                    margin: const EdgeInsets.only(top: 20),
                   ),
-                ),
-                margin: const EdgeInsets.only(top: 20),
-              ),
-              height: 260,
-              right: 40,
-            ),
-          ],
-        ),
-      ),
+                  height: 230,
+                  right: 10,
+                  left: 10),*/
+            ],
+          ),
+          backgroundColor: Colors.blue[100]),
     );
   }
 }
@@ -196,8 +192,127 @@ class InputBox extends StatefulWidget {
 }
 
 class _InputBoxState extends State<InputBox> {
+  String expirationDateMonth = "Month";
+  String expirationDateYear = "Year";
+
   @override
   Widget build(BuildContext context) {
-    return Text("hmm");
+    return ClipRRect(
+      // this one does not work for some reason
+      borderRadius: BorderRadius.circular(15),
+      child: Container(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(
+              height: 100,
+            ),
+            Container(
+              child: const Text("Card Number"),
+              padding: const EdgeInsets.only(left: 10, top: 10),
+            ),
+            Container(
+                child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                    child: TextField(
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                      ),
+                    )),
+                width: 400,
+                height: 70),
+            Container(
+              child: const Text("Card Name"),
+              padding: const EdgeInsets.only(left: 10),
+            ),
+            Container(
+                child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                    child: TextField(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                      ),
+                    )),
+                width: 400,
+                height: 70),
+            Row(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                        child: const Text("Expiration Date"),
+                        padding: const EdgeInsets.only(left: 10, bottom: 10)),
+                    Row(
+                      children: [
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Container(
+                          width: 60,
+                          height: 40,
+                          // Rounded border
+                          decoration: const ShapeDecoration(
+                              shape: RoundedRectangleBorder(
+                            side: BorderSide(
+                                width: 1.0, style: BorderStyle.solid),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(5.0)),
+                          )),
+                          // MONTH DROPDOWN
+                          child: DropdownButton(
+                            alignment: Alignment.center,
+                            value: expirationDateMonth,
+                            hint: const Text("Month"),
+                            items: <String>[
+                              "1",
+                              "2",
+                              "3",
+                              "4",
+                              "5",
+                              "6",
+                              "7",
+                              "8",
+                              "9",
+                              "10",
+                              "11",
+                              "12",
+                            ].map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                expirationDateMonth = newValue!;
+                              });
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Container(
+                          width: 60,
+                          height: 40,
+                          decoration: const ShapeDecoration(
+                              shape: RoundedRectangleBorder(
+                            side: BorderSide(
+                                width: 1.0, style: BorderStyle.solid),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(5.0)),
+                          )),
+                          // YEAR DROPDOWN
+                          child: const Text("hej")
+                        )
+                      ],
+                    )
+                  ],
+                )
+              ],
+            )
+          ],
+        ),
+      ),
+    );
   }
 }
