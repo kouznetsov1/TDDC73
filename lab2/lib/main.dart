@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:provider/provider.dart';
+import 'cardmodel.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => CardModel(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -13,8 +20,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final data = Data();
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -25,10 +30,11 @@ class _MyAppState extends State<MyApp> {
           ),
           body: Stack(
             children: [
+              // INPUTBOX
               Positioned(
                   child: Container(
                     child: const Positioned(
-                      child: InputBox(/*data: data*/),
+                      child: InputBox(),
                     ),
                     margin: const EdgeInsets.only(top: 10),
                     color: Colors.white,
@@ -37,6 +43,7 @@ class _MyAppState extends State<MyApp> {
                   width: 380,
                   right: 15,
                   top: 120),
+              // CREDITCARD
               Positioned(
                   child: Container(
                     child: const FractionallySizedBox(
@@ -79,7 +86,7 @@ class _CreditCardState extends State<CreditCard> {
         )),
         child: Column(
           children: [
-            // FIRST ROW
+            // FIRST ROW - SILVER CARD, CARD LOGO
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -104,7 +111,7 @@ class _CreditCardState extends State<CreditCard> {
                     )),
               ],
             ),
-            // SECOND ROW
+            // SECOND ROW - CARD NUMBER
             Container(
                 alignment: Alignment.centerLeft,
                 margin: const EdgeInsets.only(
@@ -113,12 +120,16 @@ class _CreditCardState extends State<CreditCard> {
                   border: Border.all(color: Colors.white),
                 ),
                 child: Container(
-                    margin: const EdgeInsets.all(2),
-                    child: const Text(
-                      "2494 1824 1924 1824",
-                      style: TextStyle(fontSize: 24, color: Colors.white),
-                    ))),
-            // THIRD ROW
+                  margin: const EdgeInsets.all(2),
+                  child: Consumer<CardModel>(
+                    builder: (context, card, child) {
+                      return Text(card.cardNumber,
+                          style: const TextStyle(
+                              fontSize: 24, color: Colors.white));
+                    },
+                  ),
+                )),
+            // THIRD ROW - CARD HOLDER NAME, NUMBER, EXPIRATION DATE
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -127,9 +138,9 @@ class _CreditCardState extends State<CreditCard> {
                   child: Container(
                     margin: const EdgeInsets.only(left: 15),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Text(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
                           "Card Holder",
                           style: TextStyle(
                             color: Colors.white54,
@@ -138,11 +149,15 @@ class _CreditCardState extends State<CreditCard> {
                           ),
                           textAlign: TextAlign.left,
                         ),
-                        Text("Card Holder Name",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold))
+                        Consumer<CardModel>(
+                          builder: (context, card, child) {
+                            return Text(card.cardHolderName,
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold));
+                          },
+                        )
                       ],
                     ),
                   ),
@@ -158,8 +173,8 @@ class _CreditCardState extends State<CreditCard> {
                     margin: const EdgeInsets.only(right: 15),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
-                      children: const [
-                        Text(
+                      children: [
+                        const Text(
                           "Expires",
                           style: TextStyle(
                             color: Colors.white54,
@@ -168,11 +183,14 @@ class _CreditCardState extends State<CreditCard> {
                           ),
                           textAlign: TextAlign.left,
                         ),
-                        Text("09/27",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold))
+                        Consumer<CardModel>(builder: (context, card, child) {
+                          return Text(
+                              "${card.expirationDateMonth}/${card.expirationDateYear}",
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold));
+                        }),
                       ],
                     ),
                   ),
@@ -184,16 +202,6 @@ class _CreditCardState extends State<CreditCard> {
       ),
     );
   }
-}
-
-class Data {
-  String expirationDateMonth = "";
-  String expirationDateYear = "";
-  String cardNumber = "";
-  String cardCVV = "";
-  String amexCardMask = "#### ###### #####";
-  String otherCardMask = "#### #### #### ####";
-  bool isCardFlipped = false;
 }
 
 class InputBox extends StatefulWidget {
@@ -233,8 +241,18 @@ class _InputBoxState extends State<InputBox> {
     "2030"
   ];
 
-  final myController = TextEditingController();
+  final TextEditingController _myControllerNumber = TextEditingController();
+  final TextEditingController _myControllerName = TextEditingController();
+  final TextEditingController _myControllerCVV = TextEditingController();
 
+  @override
+  void dispose() {
+    // Clean up controller when widget is disposed.
+    _myControllerNumber.dispose();
+    _myControllerName.dispose();
+    _myControllerCVV.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -248,34 +266,57 @@ class _InputBoxState extends State<InputBox> {
             const SizedBox(
               height: 100,
             ),
+            // CARD NUMBER - TEXT
             Container(
               child: const Text("Card Number"),
               padding: const EdgeInsets.only(left: 10, top: 25),
             ),
+            // CARD NUMBER - INPUT
             Container(
-                child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                      ),
-                    )),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                  child: Consumer<CardModel>(builder: (context, card, child) {
+                    return TextField(
+                        controller: _myControllerNumber,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                        ),
+                        onTap: () => card.setCardFront(),
+                        onChanged: (text) {
+                          card.changeCardNumber(text);
+                        });
+                  }),
+                ),
                 width: 400,
                 height: 70),
+            // CARD NAME - TEXT
             Container(
               child: const Text("Card Name"),
               padding: const EdgeInsets.only(left: 10),
             ),
+            // CARD NAME - INPUT
             Container(
-                child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                      ),
+                child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 12),
+                    child: Consumer<CardModel>(
+                      builder: (context, card, child) {
+                        return TextField(
+                          controller: _myControllerName,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                          ),
+                          onChanged: (text) {
+                            card.changeName(text);
+                          },
+                          onTap: () => card.setCardFront(),
+                        );
+                      },
                     )),
                 width: 400,
                 height: 70),
+            // EXPIRATION DATE, CVV
             Row(
               children: [
                 Column(
@@ -297,58 +338,71 @@ class _InputBoxState extends State<InputBox> {
                           decoration: const ShapeDecoration(
                               shape: RoundedRectangleBorder(
                             side: BorderSide(
-                                width: 1.0, style: BorderStyle.solid, color: Colors.grey),
+                                width: 1.0,
+                                style: BorderStyle.solid,
+                                color: Colors.grey),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(5.0)),
                           )),
                           // MONTH DROPDOWN
-                          child: DropdownButton(
-                            hint: const Text("Month"),
-                            alignment: Alignment.center,
-                            value: expirationDateMonth,
-                            items: months
-                                .map((label) => DropdownMenuItem(
-                                      child: Text(label),
-                                      value: label,
-                                    ))
-                                .toList(),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                expirationDateMonth = newValue!;
-                              });
-                            },
-                          ),
+                          child: Consumer<CardModel>(
+                              builder: (context, card, child) {
+                            return DropdownButton(
+                              hint: const Text("Month"),
+                              alignment: Alignment.center,
+                              value: expirationDateMonth,
+                              items: months
+                                  .map((label) => DropdownMenuItem(
+                                        child: Text(label),
+                                        value: label,
+                                      ))
+                                  .toList(),
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  expirationDateMonth = newValue!;
+                                });
+                                card.changeExpirationDateMonth(newValue!);
+                              },
+                              onTap: () => card.setCardFront(),
+                            );
+                          }),
                         ),
                         const SizedBox(width: 10),
                         Container(
-                          width: 100,
-                          height: 40,
-                          alignment: Alignment.center,
-                          decoration: const ShapeDecoration(
-                              shape: RoundedRectangleBorder(
-                            side: BorderSide(
-                                width: 1.0, style: BorderStyle.solid, color: Colors.grey),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(5.0)),
-                          )),
-                          // YEAR DROPDOWN
-                          child: DropdownButton(
-                            hint: const Text("Year"),
+                            width: 100,
+                            height: 40,
                             alignment: Alignment.center,
-                            value: expirationDateYear,
-                            items: years
-                                .map((label) => DropdownMenuItem(
-                                      child: Text(label),
-                                      value: label,
-                                    ))
-                                .toList(),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                expirationDateYear = newValue!;
-                              });
-                            },
-                          ),
-                        ),
+                            decoration: const ShapeDecoration(
+                                shape: RoundedRectangleBorder(
+                              side: BorderSide(
+                                  width: 1.0,
+                                  style: BorderStyle.solid,
+                                  color: Colors.grey),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5.0)),
+                            )),
+                            // YEAR DROPDOWN
+                            child: Consumer<CardModel>(
+                                builder: (context, card, child) {
+                              return DropdownButton(
+                                hint: const Text("Year"),
+                                alignment: Alignment.center,
+                                value: expirationDateYear,
+                                items: years
+                                    .map((label) => DropdownMenuItem(
+                                          child: Text(label),
+                                          value: label,
+                                        ))
+                                    .toList(),
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    expirationDateYear = newValue!;
+                                  });
+                                  card.changeExpirationDateYear(newValue!);
+                                },
+                                onTap: () => card.setCardFront(),
+                              );
+                            })),
                       ],
                     )
                   ],
@@ -364,9 +418,15 @@ class _InputBoxState extends State<InputBox> {
                       padding: const EdgeInsets.only(bottom: 10),
                     ),
                     Container(
-                      child: TextField(
-                        decoration: InputDecoration(
-                        ),
+                      child: Consumer<CardModel>(
+                        builder: (context, card, child) {
+                          return TextField(
+                            onTap: () => card.setCardBack(),
+                              controller: _myControllerCVV,
+                              onChanged: (text) {
+                                card.changeCardCVV(text);
+                              });
+                        },
                       ),
                       width: 100,
                       height: 40,
@@ -374,7 +434,10 @@ class _InputBoxState extends State<InputBox> {
                       // Rounded border
                       decoration: const ShapeDecoration(
                           shape: RoundedRectangleBorder(
-                        side: BorderSide(width: 1.0, style: BorderStyle.solid, color: Colors.grey),
+                        side: BorderSide(
+                            width: 1.0,
+                            style: BorderStyle.solid,
+                            color: Colors.grey),
                         borderRadius: BorderRadius.all(Radius.circular(5.0)),
                       )),
                     ),
