@@ -75,132 +75,184 @@ class _CreditCardState extends State<CreditCard> {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      // for rounded corners
-      borderRadius: BorderRadius.circular(15),
-      child: Container(
-        height: 210,
-        decoration: BoxDecoration(
-            image: DecorationImage(
-          image: AssetImage(randomImg),
-          fit: BoxFit.cover,
-        )),
-        child: Column(
-          children: [
-            // FIRST ROW - SILVER CARD, CARD LOGO
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                    flex: 0,
-                    child: Container(
-                      child: Image.asset("images/chip.png"),
-                      height: 40,
-                      margin: const EdgeInsets.all(10),
-                    )),
-                Expanded(
-                    flex: 2,
-                    child: Container(
-                      width: double.infinity,
-                    )),
-                Expanded(
-                    flex: 1,
-                    child: Container(
-                      child: Image.asset("images/troy.png"),
-                      height: 40,
-                      margin: const EdgeInsets.all(10),
-                    )),
-              ],
-            ),
-            // SECOND ROW - CARD NUMBER
-            Container(
-                alignment: Alignment.centerLeft,
-                margin: const EdgeInsets.only(
-                    top: 30, right: 15, left: 15, bottom: 30),
+        // for rounded corners
+        borderRadius: BorderRadius.circular(15),
+        child: Consumer<CardModel>(
+          builder: (context, card, child) {
+            if (card.frontCard) {
+              return Container(
+                height: 210,
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white),
-                ),
-                child: Container(
-                  margin: const EdgeInsets.all(2),
-                  child: Consumer<CardModel>(
-                    builder: (context, card, child) {
-                      return Text(card.cardNumber,
-                          style: const TextStyle(
-                              fontSize: 24, color: Colors.white));
-                    },
-                  ),
+                    image: DecorationImage(
+                  image: AssetImage(randomImg),
+                  fit: BoxFit.cover,
                 )),
-            // THIRD ROW - CARD HOLDER NAME, NUMBER, EXPIRATION DATE
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  flex: 0,
-                  child: Container(
-                    margin: const EdgeInsets.only(left: 15),
-                    child: Column(
+                child: Column(
+                  children: [
+                    // FIRST ROW - SILVER CARD, CARD LOGO
+                    Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Card Holder",
-                          style: TextStyle(
-                            color: Colors.white54,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.left,
-                        ),
-                        Consumer<CardModel>(
-                          builder: (context, card, child) {
-                            return Text(card.cardHolderName,
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold));
-                          },
-                        )
+                        Expanded(
+                            flex: 0,
+                            child: Container(
+                              child: Image.asset("images/chip.png"),
+                              height: 40,
+                              margin: const EdgeInsets.all(10),
+                            )),
+                        Expanded(
+                            flex: 2,
+                            child: Container(
+                              width: double.infinity,
+                            )),
+                        Expanded(
+                            flex: 1,
+                            child: Container(
+                              child: Consumer<CardModel>(
+                                builder: (context, card, child) {
+                                  return Image.asset(
+                                      "images/${card.cardIcon}.png");
+                                },
+                              ),
+                              height: 40,
+                              margin: const EdgeInsets.all(10),
+                            )),
                       ],
                     ),
-                  ),
-                ),
-                Expanded(
-                    flex: 2,
-                    child: Container(
-                      width: double.infinity,
-                    )),
-                Expanded(
-                  flex: 0,
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 15),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                    // SECOND ROW - CARD NUMBER
+                    Container(
+                        alignment: Alignment.centerLeft,
+                        margin: const EdgeInsets.only(
+                            top: 30, right: 15, left: 15, bottom: 30),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.white),
+                        ),
+                        child: Container(
+                          margin: const EdgeInsets.all(2),
+                          child: Consumer<CardModel>(
+                            builder: (context, card, child) {
+                              return Text(card.cardNumber,
+                                  style: const TextStyle(
+                                      fontSize: 24, color: Colors.white));
+                            },
+                          ),
+                        )),
+                    // THIRD ROW - CARD HOLDER NAME, NUMBER, EXPIRATION DATE
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Expires",
-                          style: TextStyle(
-                            color: Colors.white54,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
+                        Expanded(
+                          flex: 0,
+                          child: Container(
+                            margin: const EdgeInsets.only(left: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Card Holder",
+                                  style: TextStyle(
+                                    color: Colors.white54,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.left,
+                                ),
+                                Consumer<CardModel>(
+                                  builder: (context, card, child) {
+                                    return Text(card.cardHolderName,
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold));
+                                  },
+                                )
+                              ],
+                            ),
                           ),
-                          textAlign: TextAlign.left,
                         ),
-                        Consumer<CardModel>(builder: (context, card, child) {
-                          return Text(
-                              "${card.expirationDateMonth}/${card.expirationDateYear}",
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold));
-                        }),
+                        Expanded(
+                            flex: 2,
+                            child: Container(
+                              width: double.infinity,
+                            )),
+                        Expanded(
+                          flex: 0,
+                          child: Container(
+                            margin: const EdgeInsets.only(right: 15),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                const Text(
+                                  "Expires",
+                                  style: TextStyle(
+                                    color: Colors.white54,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.left,
+                                ),
+                                Consumer<CardModel>(
+                                    builder: (context, card, child) {
+                                  return Text(
+                                      "${card.expirationDateMonth}/${card.expirationDateYear}",
+                                      style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold));
+                                }),
+                              ],
+                            ),
+                          ),
+                        ),
                       ],
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
+              );
+            } else {
+              return Container(
+                  height: 210,
+                  decoration: BoxDecoration(
+                      image: DecorationImage(
+                    image: AssetImage(randomImg),
+                    fit: BoxFit.cover,
+                  )),
+                  child: Column(
+                    children: [
+                      Container(
+                          padding: EdgeInsets.only(top: 30),
+                          child: const SizedBox(
+                              width: 300,
+                              height: 40,
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(color: Colors.black),
+                              ))),
+                      Container(
+                        child: const Text(
+                          "CVV",
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+                        alignment: Alignment.bottomRight,
+                        padding: const EdgeInsets.only(right: 22, top: 10)
+                      ),
+                      Container(
+                        child: Text(card.cardCVV, style: TextStyle(fontSize: 18),),
+                        color: Colors.white,
+                        width: 300,
+                        height: 35,
+                        alignment: Alignment.centerRight,
+                        padding: EdgeInsets.only(right: 5),
+                      ),
+                      Container(
+                        child: Image.asset("images/${card.cardIcon}.png", width: 70,),
+                        alignment: Alignment.centerRight,
+                        padding: EdgeInsets.only(right: 20, top: 20),
+                      )
+                    ],
+                  ));
+            }
+          },
+        ));
   }
 }
 
@@ -278,9 +330,12 @@ class _InputBoxState extends State<InputBox> {
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                   child: Consumer<CardModel>(builder: (context, card, child) {
                     return TextField(
+                        keyboardType: TextInputType.number,
+                        maxLength: 16,
                         controller: _myControllerNumber,
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
+                          counterText: "",
                         ),
                         onTap: () => card.setCardFront(),
                         onChanged: (text) {
@@ -421,7 +476,13 @@ class _InputBoxState extends State<InputBox> {
                       child: Consumer<CardModel>(
                         builder: (context, card, child) {
                           return TextField(
-                            onTap: () => card.setCardBack(),
+                              // hide counter text
+                              decoration: const InputDecoration(
+                                counterText: "",
+                              ),
+                              keyboardType: TextInputType.number,
+                              maxLength: 4,
+                              onTap: () => card.setCardBack(),
                               controller: _myControllerCVV,
                               onChanged: (text) {
                                 card.changeCardCVV(text);
@@ -444,6 +505,15 @@ class _InputBoxState extends State<InputBox> {
                   ],
                 )
               ],
+            ),
+            Container(
+              child: ElevatedButton(
+                onPressed: () {},
+                child: const Text("SUBMIT"),
+                style: ElevatedButton.styleFrom(minimumSize: Size(350, 40)),
+              ),
+              alignment: Alignment.center,
+              padding: const EdgeInsets.only(top: 12),
             )
           ],
         ),
