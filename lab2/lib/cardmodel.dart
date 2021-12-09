@@ -87,7 +87,7 @@ class CardModel extends ChangeNotifier {
   }
 
   void changeName(String name) {
-    _cardHolderName = name;
+    _cardHolderName = name.toUpperCase();
     notifyListeners();
   }
 

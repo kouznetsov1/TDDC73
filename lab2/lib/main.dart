@@ -358,9 +358,11 @@ class _InputBoxState extends State<InputBox> {
                     child: Consumer<CardModel>(
                       builder: (context, card, child) {
                         return TextField(
+                          maxLength: 25,
                           controller: _myControllerName,
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(),
+                            counterText: "",
                           ),
                           onChanged: (text) {
                             card.changeName(text);
@@ -475,18 +477,34 @@ class _InputBoxState extends State<InputBox> {
                     Container(
                       child: Consumer<CardModel>(
                         builder: (context, card, child) {
-                          return TextField(
+                          if (card.cardIcon == "amex"){
+                            return TextField(
                               // hide counter text
-                              decoration: const InputDecoration(
-                                counterText: "",
-                              ),
-                              keyboardType: TextInputType.number,
-                              maxLength: 4,
-                              onTap: () => card.setCardBack(),
-                              controller: _myControllerCVV,
-                              onChanged: (text) {
-                                card.changeCardCVV(text);
-                              });
+                                decoration: const InputDecoration(
+                                  counterText: "",
+                                ),
+                                keyboardType: TextInputType.number,
+                                maxLength: 4,
+                                onTap: () => card.setCardBack(),
+                                controller: _myControllerCVV,
+                                onChanged: (text) {
+                                  card.changeCardCVV(text);
+                                });
+                          }
+                          else{
+                            return TextField(
+                              // hide counter text
+                                decoration: const InputDecoration(
+                                  counterText: "",
+                                ),
+                                keyboardType: TextInputType.number,
+                                maxLength: 3,
+                                onTap: () => card.setCardBack(),
+                                controller: _myControllerCVV,
+                                onChanged: (text) {
+                                  card.changeCardCVV(text);
+                                });
+                          }
                         },
                       ),
                       width: 100,
