@@ -13,8 +13,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // Personal token, good for 30 days -> 12/1-2022
-  final String _authToken = "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";
+  final String _authToken = "";
 
   @override
   Widget build(BuildContext context) {
@@ -67,26 +66,42 @@ class _MyHomePageState extends State<MyHomePage> {
     "Java",
   ];
 
+  // change this one using variables etc, just as they do in the docs
   // ignore: prefer_final_fields
   String _readRepositories = """
-  search(query: "sort:stars-desc language: \$_currLang stars:>1000", type: REPOSITORY, first:10){
-    repositoryCount
-    edges {
-      node {
-        ... on Repository {
-          name
-          description
-          stargazers {
-            totalCount
-          }
-          forks {
-            totalCount
-          }
-          licenseInfo {
+  query ReadRepositories (\$_queryInput: String!){
+    search(query: \$_queryInput, type: REPOSITORY, first: 10){
+      nodes {
+          ... on Repository {
+            id
             name
+            url
+             owner {
+              url
+            }
+            stargazers {
+              totalCount
+            }
+            forks {
+              totalCount
+            }
+           
+            licenseInfo {
+              name
+            }
+            description
+            refs(refPrefix: "refs/heads/") {
+              totalCount
+            }
+            object(expression: "master") {
+              ... on Commit {
+                history {
+                  totalCount
+                }
+              }
+            }
           }
         }
-      }
     }
   }
   """;
@@ -101,19 +116,32 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Query(
           options: QueryOptions(
             document: gql(_readRepositories),
-            pollInterval: 10,
+            variables: {
+              '_queryInput': 'sort:stars-desc language: $_currLang stars: >1000',
+            },
+            pollInterval: const Duration(seconds: 10),
           ),
-          builder: (QueryResult result, {VoidCallback refetch, FetchMore fetchMore}) {
-            if (result.hasException){
+
+          builder: (QueryResult result, { VoidCallback? refetch, FetchMore? fetchMore }) {
+            if (result.hasException) {
               return Text(result.exception.toString());
             }
-            if (result.isLoading){
-              return Text("Loading");
-            }
-            List _repositories = result.data['viewer']['repositories']['nodes'];
-            return Text(_repositories[0]['name']);
-          },
 
+            if (result.isLoading) {
+              return const Text('Loading');
+            }
+
+            // it can be either Map or List
+            List repositories = result.data!['search']['nodes'];
+
+            return ListView.builder(
+                itemCount: repositories.length,
+                itemBuilder: (context, index) {
+                  final repository = repositories[index];
+
+                  return Text(repository['name']);
+                });
+          },
         ),
       ),
     );
