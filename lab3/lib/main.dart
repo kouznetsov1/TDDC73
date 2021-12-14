@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:lab3/repo.dart';
 
 void main() async {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -17,11 +18,15 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    final HttpLink _httpLink = HttpLink('https://api.github.com/graphql',
-        defaultHeaders: {"authorization": "bearer $_authToken"});
+    final HttpLink _httpLink = HttpLink('https://api.github.com/graphql');
+
+    final AuthLink _authLink =
+        AuthLink(getToken: () async => 'Bearer $_authToken');
+
+    final Link _link = _authLink.concat(_httpLink);
 
     ValueNotifier<GraphQLClient> _client = ValueNotifier(GraphQLClient(
-      link: _httpLink,
+      link: _link,
       cache: GraphQLCache(store: InMemoryStore()),
     ));
 
@@ -32,14 +37,14 @@ class _MyAppState extends State<MyApp> {
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
-          home: const MyHomePage(title: 'Lab 3'),
+          home: MyHomePage(),
         ));
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-  final String title;
+  MyHomePage({Key? key}) : super(key: key);
+  final String title = "Trending github repos";
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -49,7 +54,6 @@ class _MyHomePageState extends State<MyHomePage> {
   String _currLang = "Python";
 
   final List<String> _languages = [
-    "Top Overall",
     "JavaScript",
     "TypeScript",
     "Go",
@@ -68,82 +72,136 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // change this one using variables etc, just as they do in the docs
   // ignore: prefer_final_fields
-  String _readRepositories = """
-  query ReadRepositories (\$_queryInput: String!){
-    search(query: \$_queryInput, type: REPOSITORY, first: 10){
+  String readRepositories = """
+  query(\$querySearch: String!) {
+    search(query: \$querySearch, type: REPOSITORY, first: 10){
       nodes {
-          ... on Repository {
-            id
+        ... on Repository {
+          name
+          description
+          nameWithOwner
+          stargazerCount
+          forkCount
+          licenseInfo {
             name
-            url
-             owner {
-              url
-            }
-            stargazers {
-              totalCount
-            }
-            forks {
-              totalCount
-            }
-           
-            licenseInfo {
-              name
-            }
-            description
-            refs(refPrefix: "refs/heads/") {
-              totalCount
-            }
-            object(expression: "master") {
-              ... on Commit {
-                history {
-                  totalCount
-                }
+          }
+          object(expression: "master"){
+            ... on Commit {
+              history {
+                totalCount
               }
             }
           }
+          refs(refPrefix: "refs/heads/"){
+            totalCount
+          }
         }
+      }
     }
   }
-  """;
+""";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Container(
-        child: Query(
-          options: QueryOptions(
-            document: gql(_readRepositories),
-            variables: {
-              '_queryInput': 'sort:stars-desc language: $_currLang stars: >1000',
-            },
-            pollInterval: const Duration(seconds: 10),
-          ),
-
-          builder: (QueryResult result, { VoidCallback? refetch, FetchMore? fetchMore }) {
-            if (result.hasException) {
-              return Text(result.exception.toString());
-            }
-
-            if (result.isLoading) {
-              return const Text('Loading');
-            }
-
-            // it can be either Map or List
-            List repositories = result.data!['search']['nodes'];
-
-            return ListView.builder(
-                itemCount: repositories.length,
-                itemBuilder: (context, index) {
-                  final repository = repositories[index];
-
-                  return Text(repository['name']);
-                });
-          },
+        appBar: AppBar(
+          title: Text(widget.title),
         ),
-      ),
-    );
+        body: Column(
+          children: [
+            Container(
+              height: 550,
+              child: Query(
+                options: QueryOptions(
+                  document: gql(readRepositories),
+                  variables: {
+                    'querySearch':
+                        'sort:stars-desc language:$_currLang stars:>1000'
+                  },
+                  pollInterval: const Duration(seconds: 10),
+                ),
+                builder: (QueryResult result,
+                    {VoidCallback? refetch, FetchMore? fetchMore}) {
+                  if (result.hasException) {
+                    return Text(result.exception.toString());
+                  }
+
+                  if (result.isLoading) {
+                    return Center(
+                      child: Text('Loading...', style: TextStyle(fontSize: 40)),
+                    );
+                  }
+
+                  // it can be either Map or List
+                  List repositories = result.data!['search']['nodes'];
+
+                  return ListView.builder(
+                      itemCount: repositories.length,
+                      itemBuilder: (context, index) {
+                        final repository = repositories[index];
+
+                        // all variables that is being passed to repo widget
+                        String name = repository['name'];
+                        String description = repository['description'];
+                        String nameWithOwner = repository['nameWithOwner'];
+                        String stargazerCount =
+                            repository['stargazerCount'].toString();
+                        String forkCount = repository['forkCount'].toString();
+                        String commits =
+                            repository['refs']['totalCount'].toString();
+                        String? licenseName;
+                        String? branches;
+
+                        if (repository['licenseInfo'] != null) {
+                          licenseName = repository['licenseInfo']['name'];
+                        }
+                        licenseName ??= "Unknown";
+
+                        if (repository['object'] != null) {
+                          branches = repository['object']['history']
+                                  ['totalCount']
+                              .toString();
+                        }
+                        branches ??= "Unknown";
+
+                        return Repo(
+                          name: name,
+                          description: description,
+                          nameWithOwner: nameWithOwner,
+                          stargazerCount: stargazerCount,
+                          forkCount: forkCount,
+                          licenseName: licenseName,
+                          commits: commits,
+                          branches: branches,
+                        );
+                      });
+                },
+              ),
+            ),
+            Container(
+              //height: 30,
+              alignment: Alignment.center,
+              width: double.infinity,
+              color: Colors.amber,
+              child: DropdownButton<String>(
+                value: _currLang,
+                underline: Container(
+                  color: Colors.transparent,
+                ),
+                items: _languages.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _currLang = newValue!;
+                  });
+                },
+              ),
+            )
+          ],
+        ));
   }
 }
