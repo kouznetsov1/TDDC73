@@ -127,7 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   }
 
                   if (result.isLoading) {
-                    return Center(
+                    return const Center(
                       child: Text('Loading...', style: TextStyle(fontSize: 40)),
                     );
                   }

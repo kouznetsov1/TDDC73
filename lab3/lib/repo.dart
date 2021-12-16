@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
 import 'package:lab3/main.dart';
 
@@ -43,7 +41,7 @@ class Repo extends StatelessWidget {
         },
         child: Container(
           width: 390,
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             border: Border.all(color: Colors.black),
           ),
@@ -62,18 +60,18 @@ class Repo extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      padding: EdgeInsets.all(2),
+                      padding: const EdgeInsets.all(2),
                     ),
                     Padding(
                       child: Text(
                         nameWithOwner,
-                        style: TextStyle(fontSize: 16),
+                        style: const TextStyle(fontSize: 16),
                       ),
-                      padding: EdgeInsets.all(2),
+                      padding: const EdgeInsets.all(2),
                     ),
                     Padding(
                       child: Text(description),
-                      padding: EdgeInsets.all(2),
+                      padding: const EdgeInsets.all(2),
                     )
                   ],
                 ),
@@ -84,18 +82,18 @@ class Repo extends StatelessWidget {
                   children: [
                     Container(
                       child: Text(stargazerCount + " ⭐"),
-                      padding: EdgeInsets.all(3),
+                      padding: const EdgeInsets.all(3),
                     ),
                     Container(
                       child: Text(forkCount + " 🍴"),
-                      padding: EdgeInsets.all(3),
+                      padding: const EdgeInsets.all(3),
                     )
                   ],
                 ),
               )
             ],
           ),
-          margin: EdgeInsets.all(8),
+          margin: const EdgeInsets.all(8),
         ),
       ),
     );
@@ -132,16 +130,16 @@ class ExtendedRepo extends StatelessWidget {
               child: Text(
                 description,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 25),
+                style: const TextStyle(fontSize: 25),
               ),
-              padding: EdgeInsets.only(top: 60, bottom: 40),
+              padding: const EdgeInsets.only(top: 60, bottom: 40),
             ),
           ),
           Center(
             child: Container(
               child: Row(
                 children: [
-                  Text(
+                  const Text(
                     "Licence",
                     style: TextStyle(fontSize: 18),
                   ),
@@ -149,7 +147,7 @@ class ExtendedRepo extends StatelessWidget {
                 ],
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               ),
-              padding: EdgeInsets.all(15),
+              padding: const EdgeInsets.all(15),
               width: 300,
             ),
           ),
@@ -157,7 +155,7 @@ class ExtendedRepo extends StatelessWidget {
             child: Container(
               child: Row(
                 children: [
-                  Text(
+                  const Text(
                     "Commits",
                     style: TextStyle(fontSize: 18),
                   ),
@@ -165,7 +163,7 @@ class ExtendedRepo extends StatelessWidget {
                 ],
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               ),
-              padding: EdgeInsets.all(15),
+              padding: const EdgeInsets.all(15),
               width: 300,
             ),
           ),
@@ -173,7 +171,7 @@ class ExtendedRepo extends StatelessWidget {
             child: Container(
               child: Row(
                 children: [
-                  Text(
+                  const Text(
                     "Branches",
                     style: TextStyle(fontSize: 18),
                   ),
@@ -181,7 +179,7 @@ class ExtendedRepo extends StatelessWidget {
                 ],
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               ),
-              padding: EdgeInsets.all(15),
+              padding: const EdgeInsets.all(15),
               width: 300,
             ),
           ),
@@ -192,9 +190,9 @@ class ExtendedRepo extends StatelessWidget {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => MyHomePage()));
                 },
-                child: Text("Tillbaka"),
+                child: const Text("Tillbaka"),
               ),
-              padding: EdgeInsets.all(30),
+              padding: const EdgeInsets.all(30),
             ),
           ),
         ],
