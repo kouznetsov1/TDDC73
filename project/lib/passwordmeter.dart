@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 class PasswordStrengthMeter extends StatefulWidget {
-  int difficulty;
-  PasswordStrengthMeter({Key? key, required this.difficulty}) : super(key: key);
+  final int difficulty;
+  String? Function(String) onPasswordChange;
+  PasswordStrengthMeter({Key? key, required this.difficulty, required this.onPasswordChange}) : super(key: key);
 
   @override
   _PasswordStrengthMeterState createState() => _PasswordStrengthMeterState();
@@ -14,6 +15,7 @@ class _PasswordStrengthMeterState extends State<PasswordStrengthMeter> {
   final List<Map> _criterias = [];
   String _warningText = "Too short";
   Color _warningColor = Colors.grey;
+
 
   @override
   void dispose() {
@@ -175,6 +177,19 @@ class _PasswordStrengthMeterState extends State<PasswordStrengthMeter> {
                 _warningText = warningText()[0];
                 _warningColor = warningText()[1];
               });
+              if (_warningText == "Good" || _warningText == "Strong"){
+                widget.onPasswordChange(text);
+              }
+              else{
+                widget.onPasswordChange("");
+              }
+              /*
+              if (_warningText == "Fair" || _warningText == "Good"){
+                widget.password = text;
+              }
+              else {
+                widget.password = "";
+              }*/
             },
           ),
         ),

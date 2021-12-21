@@ -30,6 +30,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  String _password = "";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,14 +47,18 @@ class _MyHomePageState extends State<MyHomePage> {
             // diff 4 : special characters required
             child: PasswordStrengthMeter(
               difficulty: 4,
+              onPasswordChange: (text) {
+                _password = text;
+              },
             ),
           ),
+          Text(_password),
           const SizedBox(height: 50),
           Container(
             child: Carousel(
               data: const ["images/bild1.jpeg", "images/bild2.jpeg", "images/bild3.jpeg", "images/bild4.jpeg", "images/bild5.jpeg"],
               title: "Stuff",
-              numOfItems: 1,
+              numOfItems: 2,
             )
           )
         ],

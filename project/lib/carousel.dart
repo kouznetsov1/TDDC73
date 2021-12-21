@@ -41,7 +41,6 @@ class _CarouselState extends State<Carousel> {
                     ElevatedButton(
                         onPressed: () => setState(
                               () {
-                                print(widget.data.length);
                                 if (positionInRow != 0) {
                                   positionInRow--;
                                 }
